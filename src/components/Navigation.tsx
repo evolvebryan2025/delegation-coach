@@ -19,36 +19,34 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <NavLink 
-              to="/assessment" 
+            <NavLink
+              to="/coach/assessment"
               className="text-muted-foreground hover:text-foreground transition-colors"
               activeClassName="text-primary font-semibold"
             >
               Assessment
             </NavLink>
-            <NavLink 
-              to="/framework" 
+            <NavLink
+              to="/framework"
               className="text-muted-foreground hover:text-foreground transition-colors"
               activeClassName="text-primary font-semibold"
             >
               C.L.E.A.R Framework
             </NavLink>
-            <NavLink 
-              to="/dashboard" 
+            <NavLink
+              to="/dashboard"
               className="text-muted-foreground hover:text-foreground transition-colors"
               activeClassName="text-primary font-semibold"
             >
               Dashboard
             </NavLink>
-            <Button variant="hero" size="sm" className="text-white">Get Started</Button>
+            <Button variant="hero" size="sm" className="text-white">
+              Get Started
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
+          <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -57,31 +55,33 @@ export const Navigation = () => {
         {isOpen && (
           <div className="md:hidden py-4 animate-slide-up">
             <div className="flex flex-col gap-4">
-              <NavLink 
-                to="/assessment" 
+              <NavLink
+                to="/assessment"
                 className="text-muted-foreground hover:text-foreground transition-colors py-2"
                 activeClassName="text-primary font-semibold"
                 onClick={() => setIsOpen(false)}
               >
                 Assessment
               </NavLink>
-              <NavLink 
-                to="/framework" 
+              <NavLink
+                to="/framework"
                 className="text-muted-foreground hover:text-foreground transition-colors py-2"
                 activeClassName="text-primary font-semibold"
                 onClick={() => setIsOpen(false)}
               >
                 C.L.E.A.R Framework
               </NavLink>
-              <NavLink 
-                to="/dashboard" 
+              <NavLink
+                to="/dashboard"
                 className="text-muted-foreground hover:text-foreground transition-colors py-2"
                 activeClassName="text-primary font-semibold"
                 onClick={() => setIsOpen(false)}
               >
                 Dashboard
               </NavLink>
-              <Button variant="hero" size="sm" className="w-full text-white">Get Started</Button>
+              <Button variant="hero" size="sm" className="w-full text-white">
+                Get Started
+              </Button>
             </div>
           </div>
         )}
