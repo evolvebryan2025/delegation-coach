@@ -13,7 +13,7 @@ const Index = () => {
 
   const handleOnboardingComplete = (data: OnboardingData) => {
     localStorage.setItem("onboarding", JSON.stringify(data));
-    navigate("/assessment");
+    navigate("/auth?redirect=/coach/welcome");
   };
 
   return (
