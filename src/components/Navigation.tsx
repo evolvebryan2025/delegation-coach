@@ -1,10 +1,30 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { NavLink } from "./NavLink";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isAuthenticated, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate("/coach/welcome");
+    } else {
+      navigate("/auth");
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -19,30 +39,69 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <NavLink
-              to="/coach/assessment"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              activeClassName="text-primary font-semibold"
-            >
-              Assessment
-            </NavLink>
-            <NavLink
-              to="/framework"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              activeClassName="text-primary font-semibold"
-            >
-              C.L.E.A.R Framework
-            </NavLink>
-            <NavLink
-              to="/dashboard"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              activeClassName="text-primary font-semibold"
-            >
-              Dashboard
-            </NavLink>
-            <Button variant="hero" size="sm" className="text-white">
-              Get Started
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <NavLink
+                  to="/dashboard"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  activeClassName="text-primary font-semibold"
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/plans"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  activeClassName="text-primary font-semibold"
+                >
+                  My Plans
+                </NavLink>
+                <NavLink
+                  to="/framework"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  activeClassName="text-primary font-semibold"
+                >
+                  Framework
+                </NavLink>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <User className="w-4 h-4" />
+                      <span>{user?.email?.split('@')[0]}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium">{user?.email?.split('@')[0]}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer">
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  to="/framework"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  activeClassName="text-primary font-semibold"
+                >
+                  Framework
+                </NavLink>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+                  Sign In
+                </Button>
+                <Button variant="hero" size="sm" onClick={handleGetStarted} className="text-white">
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -55,33 +114,82 @@ export const Navigation = () => {
         {isOpen && (
           <div className="md:hidden py-4 animate-slide-up">
             <div className="flex flex-col gap-4">
-              <NavLink
-                to="/assessment"
-                className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                activeClassName="text-primary font-semibold"
-                onClick={() => setIsOpen(false)}
-              >
-                Assessment
-              </NavLink>
-              <NavLink
-                to="/framework"
-                className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                activeClassName="text-primary font-semibold"
-                onClick={() => setIsOpen(false)}
-              >
-                C.L.E.A.R Framework
-              </NavLink>
-              <NavLink
-                to="/dashboard"
-                className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                activeClassName="text-primary font-semibold"
-                onClick={() => setIsOpen(false)}
-              >
-                Dashboard
-              </NavLink>
-              <Button variant="hero" size="sm" className="w-full text-white">
-                Get Started
-              </Button>
+              {isAuthenticated ? (
+                <>
+                  <NavLink
+                    to="/dashboard"
+                    className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                    activeClassName="text-primary font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </NavLink>
+                  <NavLink
+                    to="/plans"
+                    className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                    activeClassName="text-primary font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    My Plans
+                  </NavLink>
+                  <NavLink
+                    to="/framework"
+                    className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                    activeClassName="text-primary font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Framework
+                  </NavLink>
+                  <div className="pt-2 border-t border-border">
+                    <div className="text-sm text-muted-foreground mb-2 px-2">{user?.email}</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        signOut();
+                        setIsOpen(false);
+                      }}
+                      className="w-full justify-start text-destructive"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <NavLink
+                    to="/framework"
+                    className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                    activeClassName="text-primary font-semibold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Framework
+                  </NavLink>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      navigate("/auth");
+                      setIsOpen(false);
+                    }}
+                    className="w-full justify-start"
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    variant="hero"
+                    size="sm"
+                    onClick={() => {
+                      handleGetStarted();
+                      setIsOpen(false);
+                    }}
+                    className="w-full text-white"
+                  >
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -40,7 +40,30 @@ const DelegationAssessment = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [insights, setInsights] = useState<any>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const hasPreAuth = searchParams.get("hasPreAuth");
+    if (hasPreAuth === "true") {
+      const preAuthData = localStorage.getItem("pre-auth-assessment");
+      if (preAuthData) {
+        try {
+          const assessment = JSON.parse(preAuthData);
+          setResponses(assessment);
+          setCurrentStep(questions.length - 1);
+          localStorage.removeItem("pre-auth-assessment");
+          
+          toast({
+            title: "Assessment loaded!",
+            description: "Your responses have been loaded. Click Next to get your insights.",
+          });
+        } catch (error) {
+          console.error("Error loading pre-auth assessment:", error);
+        }
+      }
+    }
+  }, [searchParams, toast]);
 
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
