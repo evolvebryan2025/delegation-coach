@@ -5,6 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const WEBHOOK_URL = 'https://madeeas.app.n8n.cloud/webhook/delegate/ai';
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -12,15 +14,9 @@ serve(async (req) => {
 
   try {
     const { planData } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const startTime = Date.now();
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
-    }
-
-    const systemPrompt = `You are a delegation coach creating professional delegation plans.
-Generate a comprehensive plan with clear outcomes, success criteria, and handoff messaging.
-Be specific, actionable, and professional.`;
+    const systemPrompt = `You are a delegation coach creating professional delegation plans. Generate a comprehensive plan with clear outcomes, success criteria, and handoff messaging. Be specific, actionable, and professional.`;
 
     const userPrompt = `Create a delegation plan for:
 Task: ${planData.task_name}
@@ -38,86 +34,46 @@ Generate:
 4. Professional handoff message for the team member
 5. Best practice tips specific to this delegation`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const payload = {
+      function_type: 'generate_plan',
+      system_prompt: systemPrompt,
+      user_prompt: userPrompt,
+      data: planData
+    };
+
+    console.log('[generate-delegation-plan] Calling webhook with:', payload);
+
+    const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        tools: [{
-          type: 'function',
-          function: {
-            name: 'generate_plan',
-            description: 'Return complete delegation plan',
-            parameters: {
-              type: 'object',
-              properties: {
-                success_criteria: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Specific, measurable success criteria'
-                },
-                risks: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Potential risks with mitigation strategies'
-                },
-                check_in_schedule: {
-                  type: 'string',
-                  description: 'Recommended check-in frequency and timing'
-                },
-                handoff_message: {
-                  type: 'string',
-                  description: 'Professional message to send to team member'
-                },
-                best_practices: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Specific tips for this delegation'
-                }
-              },
-              required: ['success_criteria', 'risks', 'check_in_schedule', 'handoff_message', 'best_practices']
-            }
-          }
-        }],
-        tool_choice: { type: 'function', function: { name: 'generate_plan' } }
-      }),
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'Payment required. Please add credits to your workspace.' }), {
-          status: 402,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      throw new Error('AI gateway error');
+      throw new Error(`Webhook error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    const toolCall = data.choices[0]?.message?.tool_calls?.[0];
-    const plan = toolCall ? JSON.parse(toolCall.function.arguments) : null;
+    const duration = Date.now() - startTime;
+    
+    console.log(`[generate-delegation-plan] Received response in ${duration}ms:`, data);
 
-    return new Response(JSON.stringify({ plan }), {
+    if (!data.success) {
+      throw new Error(data.error || 'Webhook returned unsuccessful response');
+    }
+
+    return new Response(JSON.stringify({ plan: data.result }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in generate-delegation-plan:', error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
+    return new Response(JSON.stringify({ 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      details: 'Failed to generate delegation plan via webhook'
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
