@@ -1,0 +1,13 @@
+project_id = "tydzyxnuaiavgpdikbgc"
+
+[functions.analyze-assessment]
+verify_jwt = true
+
+[functions.clarify-task]
+verify_jwt = true
+
+[functions.generate-delegation-plan]
+verify_jwt = true
+
+[functions.suggest-follow-ups]
+verify_jwt = true
