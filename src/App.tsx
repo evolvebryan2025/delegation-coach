@@ -15,6 +15,8 @@ import PlanBuilder from "./pages/coach/PlanBuilder";
 import PlanOutput from "./pages/coach/PlanOutput";
 import FollowUp from "./pages/coach/FollowUp";
 import NotFound from "./pages/NotFound";
+import Plans from "./pages/Plans";
+import PlanDetail from "./pages/PlanDetail";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/framework" element={<Framework />} />
           <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+          <Route path="/plans" element={<AuthGuard><Plans /></AuthGuard>} />
+          <Route path="/plans/:id" element={<AuthGuard><PlanDetail /></AuthGuard>} />
           <Route path="/coach/welcome" element={<AuthGuard><Welcome /></AuthGuard>} />
           <Route path="/coach/assessment" element={<AuthGuard><DelegationAssessment /></AuthGuard>} />
           <Route path="/coach/task-selection" element={<AuthGuard><TaskSelection /></AuthGuard>} />
