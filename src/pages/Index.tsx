@@ -1,20 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { BenefitCard } from "@/components/BenefitCard";
 import { OnboardingModal, OnboardingData } from "@/components/OnboardingModal";
 import { Clock, Rocket, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import heroImage from "@/assets/hero-delegation.jpg";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [assessmentResponses, setAssessmentResponses] = useState({
+    draining_tasks: "",
+    tasks_not_delegating: "",
+    delegation_barriers: "",
+    team_members: ""
+  });
   const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, loading, navigate]);
 
   const handleOnboardingComplete = (data: OnboardingData) => {
     localStorage.setItem("onboarding", JSON.stringify(data));
     navigate("/auth?redirect=/coach/welcome");
   };
+
+  const handleAssessmentSubmit = () => {
+    const { draining_tasks, tasks_not_delegating, delegation_barriers, team_members } = assessmentResponses;
+    
+    if (!draining_tasks || !tasks_not_delegating || !delegation_barriers || !team_members) {
+      toast({
+        title: "Please complete all questions",
+        description: "All fields are required to get your personalized insights.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    localStorage.setItem("pre-auth-assessment", JSON.stringify({
+      ...assessmentResponses,
+      timestamp: new Date().toISOString()
+    }));
+
+    setShowLoginPrompt(true);
+  };
+
+  const handleLoginRedirect = () => {
+    navigate("/auth?redirect=/coach/assessment&hasPreAuth=true");
+  };
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,8 +129,90 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* Assessment Section */}
       <section className="py-20 px-4 bg-muted/30">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-4">Take the 2-Minute Delegation Assessment</h2>
+            <p className="text-xl text-muted-foreground">
+              Get personalized insights and actionable recommendations to improve your delegation skills
+            </p>
+          </div>
+
+          <Card className="p-8 space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="draining_tasks" className="text-lg font-semibold mb-2">
+                  What tasks are draining your time?
+                </Label>
+                <Textarea
+                  id="draining_tasks"
+                  placeholder="List the tasks that consume most of your day but don't necessarily require your unique expertise..."
+                  value={assessmentResponses.draining_tasks}
+                  onChange={(e) => setAssessmentResponses({ ...assessmentResponses, draining_tasks: e.target.value })}
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="tasks_not_delegating" className="text-lg font-semibold mb-2">
+                  What tasks do you keep doing even though someone else could?
+                </Label>
+                <Textarea
+                  id="tasks_not_delegating"
+                  placeholder="Think about tasks you're holding onto. What stops you from delegating them?"
+                  value={assessmentResponses.tasks_not_delegating}
+                  onChange={(e) => setAssessmentResponses({ ...assessmentResponses, tasks_not_delegating: e.target.value })}
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="delegation_barriers" className="text-lg font-semibold mb-2">
+                  What stops you from delegating these tasks?
+                </Label>
+                <Textarea
+                  id="delegation_barriers"
+                  placeholder="Is it perfectionism? Lack of trust? Unclear processes? Not enough time to train?"
+                  value={assessmentResponses.delegation_barriers}
+                  onChange={(e) => setAssessmentResponses({ ...assessmentResponses, delegation_barriers: e.target.value })}
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="team_members" className="text-lg font-semibold mb-2">
+                  Who on your team could take on more responsibility?
+                </Label>
+                <Textarea
+                  id="team_members"
+                  placeholder="List team members and their strengths. Who's ready to grow?"
+                  value={assessmentResponses.team_members}
+                  onChange={(e) => setAssessmentResponses({ ...assessmentResponses, team_members: e.target.value })}
+                  rows={4}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+
+            <Button 
+              onClick={handleAssessmentSubmit} 
+              size="lg" 
+              className="w-full text-white"
+              variant="hero"
+            >
+              Get My Personalized Insights
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Card>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Master the Art of Delegation?</h2>
@@ -139,6 +270,27 @@ const Index = () => {
       </section>
 
       <OnboardingModal open={showOnboarding} onOpenChange={setShowOnboarding} onComplete={handleOnboardingComplete} />
+
+      {/* Login Prompt Dialog */}
+      <Dialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Sign Up to See Your Results</DialogTitle>
+            <DialogDescription className="text-base pt-2">
+              Create a free account to get your personalized delegation insights and coaching plan
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Button onClick={handleLoginRedirect} size="lg" className="w-full text-white" variant="hero">
+              Create Account
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button variant="outline" size="lg" className="w-full" onClick={handleLoginRedirect}>
+              Already have an account? Sign in
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

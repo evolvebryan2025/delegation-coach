@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,15 +17,18 @@ const Auth = () => {
   const [role, setRole] = useState("");
   const [teamSize, setTeamSize] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/dashboard");
+        navigate(redirectTo);
       }
     });
-  }, [navigate]);
+  }, [navigate, redirectTo]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +76,7 @@ const Auth = () => {
         variant: "destructive",
       });
     } else {
-      navigate("/dashboard");
+      navigate(redirectTo);
     }
     setLoading(false);
   };
