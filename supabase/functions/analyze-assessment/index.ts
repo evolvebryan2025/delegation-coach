@@ -26,7 +26,10 @@ serve(async (req) => {
 
 Analyze these responses and provide specific insights.`;
 
+    const sessionId = crypto.randomUUID();
+    
     const payload = {
+      session_id: sessionId,
       function_type: 'analyze_assessment',
       system_prompt: systemPrompt,
       user_prompt: userPrompt,
