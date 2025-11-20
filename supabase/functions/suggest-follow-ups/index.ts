@@ -28,7 +28,10 @@ Generate:
 2. Reflection questions for later review
 3. Recommended follow-up frequency`;
 
+    const sessionId = crypto.randomUUID();
+    
     const payload = {
+      session_id: sessionId,
       function_type: 'suggest_followups',
       system_prompt: systemPrompt,
       user_prompt: userPrompt,

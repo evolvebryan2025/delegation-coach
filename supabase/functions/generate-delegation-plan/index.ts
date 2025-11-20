@@ -34,7 +34,10 @@ Generate:
 4. Professional handoff message for the team member
 5. Best practice tips specific to this delegation`;
 
+    const sessionId = crypto.randomUUID();
+    
     const payload = {
+      session_id: sessionId,
       function_type: 'generate_plan',
       system_prompt: systemPrompt,
       user_prompt: userPrompt,

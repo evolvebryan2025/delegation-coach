@@ -29,7 +29,10 @@ Based on this information, provide:
 3. Suggested context the team member needs
 4. Recommended success criteria`;
 
+    const sessionId = crypto.randomUUID();
+    
     const payload = {
+      session_id: sessionId,
       function_type: 'clarify_task',
       system_prompt: systemPrompt,
       user_prompt: userPrompt,
