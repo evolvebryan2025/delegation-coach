@@ -22,6 +22,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   const redirectTo = searchParams.get("redirect") || "/dashboard";
+  const defaultTab = searchParams.get("tab") || "login";
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -106,7 +107,7 @@ const Auth = () => {
           <p className="text-muted-foreground">Your AI delegation coach</p>
         </div>
 
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-muted">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
