@@ -59,8 +59,12 @@ const Index = () => {
     setShowLoginPrompt(true);
   };
 
+  const handleSignupRedirect = () => {
+    navigate("/auth?redirect=/coach/assessment&hasPreAuth=true&tab=signup");
+  };
+
   const handleLoginRedirect = () => {
-    navigate("/auth?redirect=/coach/assessment&hasPreAuth=true");
+    navigate("/auth?redirect=/coach/assessment&hasPreAuth=true&tab=login");
   };
 
   if (loading) {
@@ -293,7 +297,7 @@ const Index = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <Button onClick={handleLoginRedirect} size="lg" className="w-full" variant="hero">
+            <Button onClick={handleSignupRedirect} size="lg" className="w-full" variant="hero">
               Create Account
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
