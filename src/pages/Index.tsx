@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { BenefitCard } from "@/components/BenefitCard";
@@ -32,9 +32,11 @@ const Index = () => {
     }
   }, [isAuthenticated, loading, navigate]);
 
+  const assessmentRef = useRef<HTMLDivElement>(null);
+
   const handleOnboardingComplete = (data: OnboardingData) => {
     localStorage.setItem("onboarding", JSON.stringify(data));
-    navigate("/auth?redirect=/coach/welcome");
+    navigate("/auth?redirect=/coach/assessment");
   };
 
   const handleAssessmentSubmit = () => {
@@ -99,9 +101,13 @@ const Index = () => {
                   Start Your Delegation Journey
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button variant="outline" size="xl">
-                  See How It Works
-                </Button>
+              <Button 
+                variant="outline" 
+                size="xl"
+                onClick={() => assessmentRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                See How It Works
+              </Button>
               </div>
 
               <div className="flex items-center gap-8 pt-4">
@@ -135,7 +141,7 @@ const Index = () => {
       </section>
 
       {/* Assessment Section */}
-      <section className="py-20 px-4 bg-background-secondary relative">
+      <section ref={assessmentRef} className="py-20 px-4 bg-background-secondary relative">
         <div className="absolute inset-0 bg-grid-pattern opacity-30" />
         <div className="container mx-auto max-w-4xl relative">
           <div className="text-center mb-12">
