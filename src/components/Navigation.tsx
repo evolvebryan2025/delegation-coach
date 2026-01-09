@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, User } from "lucide-react";
+import logo from "@/assets/logo.png";
 import { useState } from "react";
 import { NavLink } from "./NavLink";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,9 +32,7 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <NavLink to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-glow-sm">
-              DC
-            </div>
+            <img src={logo} alt="Delegation Coach Logo" className="w-10 h-10" />
             <span className="font-semibold text-lg tracking-tight">Delegation Coach</span>
           </NavLink>
 
