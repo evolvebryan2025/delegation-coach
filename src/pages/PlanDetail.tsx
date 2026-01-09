@@ -6,7 +6,34 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Trash2, Copy, Mail, CheckCircle2, Calendar, Check, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Copy, Mail, CheckCircle2, Calendar, Check, AlertTriangle, Shield, Clock, Video, ListChecks } from "lucide-react";
+
+interface RiskItem {
+  risk: string;
+  mitigation: string;
+}
+
+interface CheckInSchedule {
+  frequency: string;
+  format: string;
+  topics: string[];
+}
+
+const parseRisk = (riskStr: string): RiskItem | null => {
+  try {
+    return JSON.parse(riskStr);
+  } catch {
+    return null;
+  }
+};
+
+const parseCheckInSchedule = (scheduleStr: string): CheckInSchedule | null => {
+  try {
+    return JSON.parse(scheduleStr);
+  } catch {
+    return null;
+  }
+};
 import { Skeleton } from "@/components/ui/skeleton";
 
 const PlanDetail = () => {
@@ -184,13 +211,28 @@ const PlanDetail = () => {
               {plan.risks && plan.risks.length > 0 && (
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-warning">Risks & Mitigation</h3>
-                  <ul className="space-y-2">
-                    {plan.risks.map((risk: string, i: number) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
-                        <span>{risk}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-3">
+                    {plan.risks.map((riskStr: string, i: number) => {
+                      const riskData = parseRisk(riskStr);
+                      if (!riskData) return (
+                        <li key={i} className="flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
+                          <span>{riskStr}</span>
+                        </li>
+                      );
+                      return (
+                        <li key={i} className="p-4 rounded-lg bg-warning/5 border border-warning/20">
+                          <div className="flex items-start gap-2 mb-2">
+                            <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
+                            <span className="font-medium">{riskData.risk}</span>
+                          </div>
+                          <div className="flex items-start gap-2 ml-6">
+                            <Shield className="w-4 h-4 text-success mt-1 flex-shrink-0" />
+                            <span className="text-muted-foreground">{riskData.mitigation}</span>
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               )}
@@ -198,7 +240,38 @@ const PlanDetail = () => {
               {plan.check_in_schedule && (
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-primary">Check-in Schedule</h3>
-                  <p>{plan.check_in_schedule}</p>
+                  {(() => {
+                    const schedule = parseCheckInSchedule(plan.check_in_schedule);
+                    if (!schedule) return <p>{plan.check_in_schedule}</p>;
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-primary" />
+                          <span><strong>Frequency:</strong> {schedule.frequency}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Video className="w-4 h-4 text-primary" />
+                          <span><strong>Format:</strong> {schedule.format}</span>
+                        </div>
+                        {schedule.topics && schedule.topics.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <ListChecks className="w-4 h-4 text-primary" />
+                              <strong>Topics to Cover:</strong>
+                            </div>
+                            <ul className="ml-6 space-y-1">
+                              {schedule.topics.map((topic, i) => (
+                                <li key={i} className="flex items-center gap-2">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                  <span>{topic}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
