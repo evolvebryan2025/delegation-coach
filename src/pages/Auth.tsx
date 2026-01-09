@@ -102,7 +102,7 @@ const Auth = () => {
       
       <Card className="w-full max-w-md p-8 relative">
         <div className="text-center mb-8">
-          <img src={logo} alt="Delegation Coach Logo" className="w-16 h-16 mx-auto mb-4" />
+          <img src={logo} alt="Madeea Logo" className="h-10 mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2 tracking-tight">Welcome to Delegate</h1>
           <p className="text-muted-foreground">Your AI delegation coach</p>
         </div>
