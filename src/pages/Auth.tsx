@@ -82,15 +82,23 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      {/* Background glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[60%] h-[40%] bg-[radial-gradient(ellipse_at_center,hsl(217_91%_60%_/_0.08)_0%,transparent_70%)]" />
+      </div>
+      
+      <Card className="w-full max-w-md p-8 relative">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome to Delegate</h1>
+          <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4 shadow-glow-sm">
+            DC
+          </div>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight">Welcome to Delegate</h1>
           <p className="text-muted-foreground">Your AI delegation coach</p>
         </div>
 
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 bg-muted">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
@@ -106,6 +114,7 @@ const Auth = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="you@example.com"
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
               <div>
@@ -117,9 +126,10 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" variant="hero" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
               </Button>
             </form>
@@ -136,6 +146,7 @@ const Auth = () => {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   placeholder="John Doe"
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
               <div>
@@ -147,6 +158,7 @@ const Auth = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="you@example.com"
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
               <div>
@@ -159,6 +171,7 @@ const Auth = () => {
                   required
                   placeholder="••••••••"
                   minLength={6}
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
               <div>
@@ -169,6 +182,7 @@ const Auth = () => {
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                   placeholder="Manager, Team Lead, etc."
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
               <div>
@@ -179,9 +193,10 @@ const Auth = () => {
                   value={teamSize}
                   onChange={(e) => setTeamSize(e.target.value)}
                   placeholder="5"
+                  className="bg-background border-border focus:border-primary"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" variant="hero" disabled={loading}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account"}
               </Button>
             </form>

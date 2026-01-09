@@ -27,14 +27,14 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <NavLink to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-lg">
+          <NavLink to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-glow-sm">
               DC
             </div>
-            <span className="font-bold text-lg">Delegation Coach</span>
+            <span className="font-semibold text-lg tracking-tight">Delegation Coach</span>
           </NavLink>
 
           {/* Desktop Navigation */}
@@ -44,21 +44,21 @@ export const Navigation = () => {
                 <NavLink
                   to="/dashboard"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  activeClassName="text-primary font-semibold"
+                  activeClassName="text-primary font-medium"
                 >
                   Dashboard
                 </NavLink>
                 <NavLink
                   to="/plans"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  activeClassName="text-primary font-semibold"
+                  activeClassName="text-primary font-medium"
                 >
                   My Plans
                 </NavLink>
                 <NavLink
                   to="/framework"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  activeClassName="text-primary font-semibold"
+                  activeClassName="text-primary font-medium"
                 >
                   Framework
                 </NavLink>
@@ -70,15 +70,15 @@ export const Navigation = () => {
                       <span>{user?.email?.split('@')[0]}</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-56 bg-card border-border">
                     <DropdownMenuLabel>
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium">{user?.email?.split('@')[0]}</p>
                         <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer">
+                    <DropdownMenuSeparator className="bg-border" />
+                    <DropdownMenuItem onClick={signOut} className="text-destructive cursor-pointer focus:text-destructive">
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
                     </DropdownMenuItem>
@@ -90,14 +90,14 @@ export const Navigation = () => {
                 <NavLink
                   to="/framework"
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  activeClassName="text-primary font-semibold"
+                  activeClassName="text-primary font-medium"
                 >
                   Framework
                 </NavLink>
                 <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
                   Sign In
                 </Button>
-                <Button variant="hero" size="sm" onClick={handleGetStarted} className="text-white">
+                <Button variant="hero" size="sm" onClick={handleGetStarted}>
                   Get Started
                 </Button>
               </>
@@ -105,21 +105,25 @@ export const Navigation = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
+          <button 
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors" 
+            onClick={() => setIsOpen(!isOpen)} 
+            aria-label="Toggle menu"
+          >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 animate-slide-up">
+          <div className="md:hidden py-4 animate-fade-in border-t border-border">
             <div className="flex flex-col gap-4">
               {isAuthenticated ? (
                 <>
                   <NavLink
                     to="/dashboard"
                     className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                    activeClassName="text-primary font-semibold"
+                    activeClassName="text-primary font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     Dashboard
@@ -127,7 +131,7 @@ export const Navigation = () => {
                   <NavLink
                     to="/plans"
                     className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                    activeClassName="text-primary font-semibold"
+                    activeClassName="text-primary font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     My Plans
@@ -135,7 +139,7 @@ export const Navigation = () => {
                   <NavLink
                     to="/framework"
                     className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                    activeClassName="text-primary font-semibold"
+                    activeClassName="text-primary font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     Framework
@@ -149,7 +153,7 @@ export const Navigation = () => {
                         signOut();
                         setIsOpen(false);
                       }}
-                      className="w-full justify-start text-destructive"
+                      className="w-full justify-start text-destructive hover:text-destructive"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Logout
@@ -161,7 +165,7 @@ export const Navigation = () => {
                   <NavLink
                     to="/framework"
                     className="text-muted-foreground hover:text-foreground transition-colors py-2"
-                    activeClassName="text-primary font-semibold"
+                    activeClassName="text-primary font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     Framework
@@ -184,7 +188,7 @@ export const Navigation = () => {
                       handleGetStarted();
                       setIsOpen(false);
                     }}
-                    className="w-full text-white"
+                    className="w-full"
                   >
                     Get Started
                   </Button>
