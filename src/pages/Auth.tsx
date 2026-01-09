@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -100,9 +101,7 @@ const Auth = () => {
       
       <Card className="w-full max-w-md p-8 relative">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4 shadow-glow-sm">
-            DC
-          </div>
+          <img src={logo} alt="Delegation Coach Logo" className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-3xl font-bold mb-2 tracking-tight">Welcome to Delegate</h1>
           <p className="text-muted-foreground">Your AI delegation coach</p>
         </div>
