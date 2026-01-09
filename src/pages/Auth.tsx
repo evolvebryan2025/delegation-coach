@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/madeea-logo.png";
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
