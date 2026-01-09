@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Download, Mail, Edit, ArrowRight } from "lucide-react";
+import { Copy, Download, Mail, Edit, ArrowRight, Check, AlertTriangle } from "lucide-react";
 
 const PlanOutput = () => {
   const location = useLocation();
@@ -58,7 +58,7 @@ const PlanOutput = () => {
                 <ul className="space-y-2">
                   {plan.success_criteria.map((criteria: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="text-success mt-1">✓</span>
+                      <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
                       <span>{criteria}</span>
                     </li>
                   ))}
@@ -75,7 +75,7 @@ const PlanOutput = () => {
                 <ul className="space-y-2">
                   {plan.risks.map((risk: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="text-warning mt-1">⚠</span>
+                      <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
                       <span>{risk}</span>
                     </li>
                   ))}

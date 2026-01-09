@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { Sprout, Leaf, TreeDeciduous, Trophy, Crown } from "lucide-react";
 
 interface Question {
   id: number;
@@ -89,27 +90,22 @@ const Assessment = () => {
     
     let level = 1;
     let levelName = "Task Delegator";
-    let emoji = "🌱";
 
     if (average >= 8) {
       level = 5;
       levelName = "Strategic Delegator";
-      emoji = "👑";
     } else if (average >= 6.5) {
       level = 4;
       levelName = "Knowledge Transferrer";
-      emoji = "🏆";
     } else if (average >= 5) {
       level = 3;
       levelName = "Process Builder";
-      emoji = "🌳";
     } else if (average >= 3.5) {
       level = 2;
       levelName = "Project Manager";
-      emoji = "🌿";
     }
 
-    localStorage.setItem("assessmentResults", JSON.stringify({ level, levelName, emoji, score: average }));
+    localStorage.setItem("assessmentResults", JSON.stringify({ level, levelName, score: average }));
     
     toast({
       title: "Assessment Complete!",

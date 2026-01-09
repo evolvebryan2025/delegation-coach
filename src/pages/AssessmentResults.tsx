@@ -3,14 +3,21 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Trophy, TrendingUp } from "lucide-react";
+import { ArrowRight, Trophy, TrendingUp, PartyPopper, Sprout, Leaf, TreeDeciduous, Crown } from "lucide-react";
 
 interface Results {
   level: number;
   levelName: string;
-  emoji: string;
   score: number;
 }
+
+const levelIcons: Record<number, React.ComponentType<{ className?: string }>> = {
+  1: Sprout,
+  2: Leaf,
+  3: TreeDeciduous,
+  4: Trophy,
+  5: Crown,
+};
 
 const levelDescriptions: Record<number, { description: string; nextSteps: string[] }> = {
   1: {
@@ -81,8 +88,8 @@ const AssessmentResults = () => {
       
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl animate-scale-in">
-            🎉
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-scale-in">
+            <PartyPopper className="w-16 h-16 text-warning" />
           </div>
         </div>
       )}
@@ -90,9 +97,14 @@ const AssessmentResults = () => {
       <div className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12 animate-slide-up">
-            <div className="w-32 h-32 gradient-primary rounded-full mx-auto mb-6 flex items-center justify-center text-7xl shadow-glow animate-scale-in">
-              {results.emoji}
-            </div>
+            {(() => {
+              const LevelIcon = levelIcons[results.level];
+              return (
+                <div className="w-32 h-32 gradient-primary rounded-full mx-auto mb-6 flex items-center justify-center shadow-glow animate-scale-in">
+                  <LevelIcon className="w-16 h-16 text-white" />
+                </div>
+              );
+            })()}
             <h1 className="text-5xl font-bold mb-4">
               You're a{" "}
               <span className="gradient-primary bg-clip-text text-transparent">
@@ -108,7 +120,10 @@ const AssessmentResults = () => {
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                <span className="text-3xl">{results.emoji}</span>
+                {(() => {
+                  const LevelIcon = levelIcons[results.level];
+                  return <LevelIcon className="w-8 h-8 text-primary" />;
+                })()}
                 Your Level
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-6">

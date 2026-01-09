@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { HeartCrack, Clock, Target, Handshake, BarChart3, Sparkles } from "lucide-react";
 
 interface OnboardingModalProps {
   open: boolean;
@@ -22,11 +23,11 @@ export interface OnboardingData {
 }
 
 const challenges = [
-  { id: "letgo", emoji: "😰", label: "I struggle to let go" },
-  { id: "time", emoji: "⏰", label: "I don't have time to explain" },
-  { id: "what", emoji: "🎯", label: "I don't know what to delegate" },
-  { id: "ready", emoji: "🤝", label: "My team isn't ready" },
-  { id: "track", emoji: "📊", label: "I'm not sure how to track it" },
+  { id: "letgo", icon: HeartCrack, label: "I struggle to let go" },
+  { id: "time", icon: Clock, label: "I don't have time to explain" },
+  { id: "what", icon: Target, label: "I don't know what to delegate" },
+  { id: "ready", icon: Handshake, label: "My team isn't ready" },
+  { id: "track", icon: BarChart3, label: "I'm not sure how to track it" },
 ];
 
 export const OnboardingModal = ({ open, onOpenChange, onComplete }: OnboardingModalProps) => {
@@ -69,8 +70,8 @@ export const OnboardingModal = ({ open, onOpenChange, onComplete }: OnboardingMo
           {step === 1 && (
             <div className="animate-scale-in space-y-4">
               <div className="text-center mb-6">
-                <div className="w-20 h-20 gradient-primary rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">
-                  👋
+                <div className="w-20 h-20 gradient-primary rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Sparkles className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Hi! Let's get started</h3>
                 <p className="text-muted-foreground">What should we call you?</p>
@@ -116,13 +117,13 @@ export const OnboardingModal = ({ open, onOpenChange, onComplete }: OnboardingMo
                     <button
                       key={c.id}
                       onClick={() => setChallenge(c.id)}
-                      className={`p-4 rounded-xl border-2 transition-all text-left hover:border-primary ${
+                      className={`p-4 rounded-xl border-2 transition-all text-left hover:border-primary flex items-center ${
                         challenge === c.id
                           ? "border-primary bg-primary/5"
                           : "border-border bg-card"
                       }`}
                     >
-                      <span className="text-2xl mr-3">{c.emoji}</span>
+                      <c.icon className="w-6 h-6 mr-3 text-muted-foreground" />
                       <span className="font-medium">{c.label}</span>
                     </button>
                   ))}
@@ -157,7 +158,7 @@ export const OnboardingModal = ({ open, onOpenChange, onComplete }: OnboardingMo
 
                   <div className="bg-success/10 border border-success/20 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl">🎯</span>
+                      <Target className="w-6 h-6 text-success flex-shrink-0" />
                       <div>
                         <div className="font-semibold text-success-foreground mb-1">
                           Potential Time Savings
