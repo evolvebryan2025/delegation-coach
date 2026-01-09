@@ -12,7 +12,7 @@ export const buttonVariants = cva(
         ghost: "hover:bg-secondary/10 text-muted-foreground hover:text-secondary",
         link: "text-primary underline-offset-4 hover:underline",
         success: "bg-success text-success-foreground hover:bg-success/90 shadow-md",
-        hero: "gradient-primary text-white hover:bg-secondary hover:-translate-y-0.5 active:translate-y-0",
+        hero: "btn-hero text-white hover:-translate-y-0.5 active:translate-y-0",
       },
       size: {
         default: "h-10 px-4 py-2",

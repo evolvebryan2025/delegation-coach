@@ -134,6 +134,15 @@
     background: var(--gradient-success);
   }
   
+  /* Hero Button - switches from gradient to solid orange on hover */
+  .btn-hero {
+    background: var(--gradient-primary);
+  }
+  
+  .btn-hero:hover {
+    background: hsl(var(--secondary));
+  }
+  
   /* Text Gradient - Orange Accent */
   .text-gradient-primary {
     @apply bg-clip-text text-transparent;

@@ -275,7 +275,7 @@ const Index = () => {
                 variant="secondary"
                 size="xl"
                 onClick={() => setShowOnboarding(true)}
-                className="bg-white text-primary hover:bg-white/90 shadow-xl hover:text-primary border-0"
+                className="bg-white text-primary hover:bg-secondary hover:text-secondary-foreground shadow-xl border-0"
               >
                 Get Started - It's Free
                 <ArrowRight className="w-5 h-5" />

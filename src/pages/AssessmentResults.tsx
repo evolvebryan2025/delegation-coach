@@ -168,7 +168,7 @@ const AssessmentResults = () => {
                 variant="secondary"
                 size="lg"
                 onClick={() => navigate("/framework")}
-                className="bg-white text-primary hover:bg-white/90"
+                className="bg-white text-primary hover:bg-secondary hover:text-secondary-foreground"
               >
                 Learn C.L.E.A.R Framework
                 <ArrowRight className="w-5 h-5" />
@@ -177,7 +177,7 @@ const AssessmentResults = () => {
                 variant="outline"
                 size="lg"
                 onClick={() => navigate("/dashboard")}
-                className="border-white text-white hover:bg-white/10"
+                className="border-white text-white hover:bg-secondary hover:border-secondary hover:text-secondary-foreground"
               >
                 Go to Dashboard
               </Button>
