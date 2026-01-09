@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, User } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/madeea-logo.png";
 import { useState } from "react";
 import { NavLink } from "./NavLink";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,9 +31,8 @@ export const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <NavLink to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Delegation Coach Logo" className="w-10 h-10" />
-            <span className="font-semibold text-lg tracking-tight">Delegation Coach</span>
+          <NavLink to="/" className="flex items-center">
+            <img src={logo} alt="Madeea Logo" className="h-8" />
           </NavLink>
 
           {/* Desktop Navigation */}
