@@ -294,7 +294,21 @@ const PlanDetail = () => {
             </Card>
           )}
 
-          {followUps.length > 0 && (
+          {followUps.length === 0 && plan.status !== "completed" ? (
+            <Card className="p-6 border-dashed border-2">
+              <div className="text-center">
+                <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">No Follow-Up Scheduled</h3>
+                <p className="text-muted-foreground mb-4">
+                  Set up check-in reminders to ensure successful delegation
+                </p>
+                <Button onClick={() => navigate("/coach/follow-up", { state: { plan } })}>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Set Up Follow-Up
+                </Button>
+              </div>
+            </Card>
+          ) : followUps.length > 0 ? (
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
@@ -323,7 +337,7 @@ const PlanDetail = () => {
                 ))}
               </div>
             </Card>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
