@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Check } from "lucide-react";
 
 const questions = [
   {
@@ -183,9 +183,9 @@ const DelegationAssessment = () => {
                 <div>
                   <h3 className="text-xl font-semibold mb-3 text-success">Recommendations</h3>
                   <ul className="space-y-2">
-                    {insights.recommendations.map((rec: string, i: number) => (
+                  {insights.recommendations.map((rec: string, i: number) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-success mt-1">✓</span>
+                        <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
                         <span>{rec}</span>
                       </li>
                     ))}

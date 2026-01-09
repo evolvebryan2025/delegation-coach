@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, Target, Users, TrendingUp, Plus } from "lucide-react";
+import { Clock, Target, Users, TrendingUp, Plus, Flame, TreeDeciduous } from "lucide-react";
 import { useUserStats } from "@/hooks/useUserStats";
 import { useActivePlans } from "@/hooks/useActivePlans";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -96,8 +96,8 @@ const Dashboard = () => {
               </div>
               <div className="text-3xl font-bold mb-1">Level 3</div>
               <div className="text-sm text-muted-foreground">Process Builder</div>
-              <div className="mt-2 text-xs text-primary">
-                🌳 75% to Level 4
+              <div className="mt-2 text-xs text-primary flex items-center gap-1">
+                <TreeDeciduous className="w-3 h-3" /> 75% to Level 4
               </div>
             </Card>
           </div>
@@ -108,7 +108,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-5xl font-bold mb-2 flex items-center gap-3">
-                    🔥 <span>{stats.currentStreak} Week Streak</span>
+                    <Flame className="w-10 h-10" /> <span>{stats.currentStreak} Week Streak</span>
                   </div>
                   <p className="text-white/90">
                     You're on fire! Keep up the amazing delegation momentum.

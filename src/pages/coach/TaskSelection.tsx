@@ -236,7 +236,7 @@ const TaskSelection = () => {
                   <ul className="mt-2 p-4 bg-muted rounded-lg space-y-2">
                     {clarification.success_criteria.map((criteria: string, i: number) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-success mt-1">✓</span>
+                        <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
                         <span>{criteria}</span>
                       </li>
                     ))}

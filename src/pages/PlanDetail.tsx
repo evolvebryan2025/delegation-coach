@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Trash2, Copy, Mail, CheckCircle2, Calendar } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Copy, Mail, CheckCircle2, Calendar, Check, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const PlanDetail = () => {
@@ -166,7 +166,7 @@ const PlanDetail = () => {
                   <ul className="space-y-2">
                     {plan.success_criteria.map((criteria: string, i: number) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-success mt-1">✓</span>
+                        <Check className="w-4 h-4 text-success mt-1 flex-shrink-0" />
                         <span>{criteria}</span>
                       </li>
                     ))}
@@ -187,7 +187,7 @@ const PlanDetail = () => {
                   <ul className="space-y-2">
                     {plan.risks.map((risk: string, i: number) => (
                       <li key={i} className="flex items-start gap-2">
-                        <span className="text-warning mt-1">⚠</span>
+                        <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
                         <span>{risk}</span>
                       </li>
                     ))}

@@ -1,6 +1,6 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
-import { Target, Lightbulb, Scale, Check, RefreshCw } from "lucide-react";
+import { Target, Lightbulb, Scale, Check, RefreshCw, X } from "lucide-react";
 
 const frameworkSteps = [
   {
@@ -98,13 +98,15 @@ const Framework = () => {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4">
                         <div className="text-sm font-semibold text-destructive mb-2 flex items-center gap-2">
-                          ❌ Before
+                          <X className="w-4 h-4" /> Before
                         </div>
                         <div className="text-muted-foreground italic">"{step.before}"</div>
                       </div>
 
                       <div className="bg-success/10 border border-success/20 rounded-xl p-4">
-                        <div className="text-sm font-semibold text-success mb-2 flex items-center gap-2">✅ After</div>
+                        <div className="text-sm font-semibold text-success mb-2 flex items-center gap-2">
+                          <Check className="w-4 h-4" /> After
+                        </div>
                         <div className="text-foreground">"{step.after}"</div>
                       </div>
                     </div>
