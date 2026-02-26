@@ -14,13 +14,33 @@ const FollowUp = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { plan } = location.state as any;
-  
+
   const [checkInDate, setCheckInDate] = useState("");
   const [frequency, setFrequency] = useState("weekly");
   const [loading, setLoading] = useState(false);
 
+  if (!location.state || !(location.state as any).plan) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-24 pb-16 px-4">
+          <div className="container mx-auto max-w-3xl text-center">
+            <h2 className="text-2xl font-bold mb-4">No Plan Selected</h2>
+            <p className="text-muted-foreground mb-6">Please create a delegation plan first.</p>
+            <Button onClick={() => navigate("/coach/plan-builder")}>Go to Plan Builder</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { plan } = location.state as any;
+
   const handleComplete = async () => {
+    if (!checkInDate) {
+      toast({ title: "Date Required", description: "Please select a check-in date.", variant: "destructive" });
+      return;
+    }
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();

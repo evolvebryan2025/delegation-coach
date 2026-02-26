@@ -17,6 +17,8 @@ import FollowUp from "./pages/coach/FollowUp";
 import NotFound from "./pages/NotFound";
 import Plans from "./pages/Plans";
 import PlanDetail from "./pages/PlanDetail";
+import Assessment from "./pages/Assessment";
+import AssessmentResults from "./pages/AssessmentResults";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +32,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/framework" element={<Framework />} />
-          <Route path="/assessment" element={<Navigate to="/coach/assessment" replace />} />
+          <Route path="/assessment" element={<Assessment />} />
+          <Route path="/assessment-results" element={<AssessmentResults />} />
           <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
           <Route path="/plans" element={<AuthGuard><Plans /></AuthGuard>} />
           <Route path="/plans/:id" element={<AuthGuard><PlanDetail /></AuthGuard>} />

@@ -164,11 +164,13 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, email, full_name)
+  insert into public.profiles (id, email, full_name, role, team_size)
   values (
     new.id,
     new.email,
-    new.raw_user_meta_data->>'full_name'
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'role',
+    (new.raw_user_meta_data->>'team_size')::integer
   );
   return new;
 end;

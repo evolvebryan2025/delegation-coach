@@ -36,27 +36,37 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: {
-          full_name: fullName,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
+            role: role,
+            team_size: teamSize ? parseInt(teamSize, 10) : null,
+          },
         },
-      },
-    });
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
       });
-    } else {
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Account created. Please check your email to verify.",
+        });
+      }
+    } catch (err: any) {
       toast({
-        title: "Success!",
-        description: "Account created. Please check your email to verify.",
+        title: "Connection Error",
+        description: "Unable to reach the server. The Supabase project may be paused or offline. Please try again later.",
+        variant: "destructive",
       });
     }
     setLoading(false);
@@ -66,19 +76,27 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        navigate(redirectTo);
+      }
+    } catch (err: any) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Connection Error",
+        description: "Unable to reach the server. The Supabase project may be paused or offline. Please try again later.",
         variant: "destructive",
       });
-    } else {
-      navigate(redirectTo);
     }
     setLoading(false);
   };

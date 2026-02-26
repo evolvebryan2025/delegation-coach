@@ -64,6 +64,18 @@ const PlanBuilder = () => {
   };
 
   const handleGenerate = async () => {
+    if (!taskName.trim()) {
+      toast({ title: "Task name required", description: "Please enter a task name.", variant: "destructive" });
+      return;
+    }
+    if (!teamMember.trim()) {
+      toast({ title: "Team member required", description: "Please enter who you're delegating to.", variant: "destructive" });
+      return;
+    }
+    if (!outcome.trim()) {
+      toast({ title: "Outcome required", description: "Please describe the desired outcome.", variant: "destructive" });
+      return;
+    }
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();

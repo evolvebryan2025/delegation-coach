@@ -27,12 +27,28 @@ const parseRisk = (riskStr: string): RiskItem | null => {
   }
 };
 
-const parseCheckInSchedule = (scheduleStr: string): CheckInSchedule | null => {
-  try {
-    return JSON.parse(scheduleStr);
-  } catch {
-    return null;
+const parseRiskItem = (risk: any): RiskItem | null => {
+  if (typeof risk === "object" && risk !== null && "risk" in risk && "mitigation" in risk) {
+    return risk as RiskItem;
   }
+  if (typeof risk === "string") {
+    return parseRisk(risk);
+  }
+  return null;
+};
+
+const parseCheckInSchedule = (scheduleData: any): CheckInSchedule | null => {
+  if (typeof scheduleData === "object" && scheduleData !== null && "frequency" in scheduleData) {
+    return scheduleData as CheckInSchedule;
+  }
+  if (typeof scheduleData === "string") {
+    try {
+      return JSON.parse(scheduleData);
+    } catch {
+      return null;
+    }
+  }
+  return null;
 };
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -212,12 +228,13 @@ const PlanDetail = () => {
                 <div>
                   <h3 className="text-xl font-semibold mb-2 text-warning">Risks & Mitigation</h3>
                   <ul className="space-y-3">
-                    {plan.risks.map((riskStr: string, i: number) => {
-                      const riskData = parseRisk(riskStr);
+                    {plan.risks.map((riskItem: any, i: number) => {
+                      const riskData = parseRiskItem(riskItem);
+                      const displayStr = typeof riskItem === "string" ? riskItem : (riskItem?.risk || JSON.stringify(riskItem));
                       if (!riskData) return (
                         <li key={i} className="flex items-start gap-2">
                           <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
-                          <span>{riskStr}</span>
+                          <span>{displayStr}</span>
                         </li>
                       );
                       return (

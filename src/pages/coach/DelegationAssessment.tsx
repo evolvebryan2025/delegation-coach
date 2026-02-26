@@ -44,24 +44,38 @@ const DelegationAssessment = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Always check for pre-auth data from landing page assessment
-    const preAuthData = localStorage.getItem("pre-auth-assessment");
-    if (preAuthData) {
-      try {
-        const assessment = JSON.parse(preAuthData);
-        setResponses(assessment);
-        setCurrentStep(questions.length - 1);
-        localStorage.removeItem("pre-auth-assessment");
-        
-        toast({
-          title: "Assessment loaded!",
-          description: "Your responses have been loaded. Click Next to get your insights.",
-        });
-      } catch (error) {
-        console.error("Error loading pre-auth assessment:", error);
+    // Check if user already completed an assessment - skip to task selection
+    const checkExisting = async () => {
+      const preAuthData = localStorage.getItem("pre-auth-assessment");
+      if (preAuthData) {
+        try {
+          const assessment = JSON.parse(preAuthData);
+          setResponses(assessment);
+          setCurrentStep(questions.length - 1);
+          localStorage.removeItem("pre-auth-assessment");
+          toast({
+            title: "Assessment loaded!",
+            description: "Your responses have been loaded. Click Next to get your insights.",
+          });
+        } catch (error) {
+          console.error("Error loading pre-auth assessment:", error);
+        }
+        return;
       }
-    }
-  }, [toast]);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("delegation_assessments")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+      if (data && data.length > 0) {
+        navigate("/coach/task-selection", { replace: true });
+      }
+    };
+    checkExisting();
+  }, [toast, navigate]);
 
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;

@@ -1,11 +1,36 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Users, TrendingUp, Target, Zap } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Welcome = () => {
   const navigate = useNavigate();
+  const [hasAssessment, setHasAssessment] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAssessment = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("delegation_assessments")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+      setHasAssessment(data !== null && data.length > 0);
+    };
+    checkAssessment();
+  }, []);
+
+  const handleBegin = () => {
+    if (hasAssessment) {
+      navigate("/coach/task-selection");
+    } else {
+      navigate("/coach/assessment");
+    }
+  };
 
   const mindsetShifts = [
     {
@@ -72,13 +97,13 @@ const Welcome = () => {
               This guided coaching experience will help you identify what to delegate, 
               create clear plans, and build lasting delegation habits.
             </p>
-            <Button 
+            <Button
               size="xl"
               variant="secondary"
-              onClick={() => navigate("/coach/assessment")}
+              onClick={handleBegin}
               className="group"
             >
-              Begin Delegation Coaching
+              {hasAssessment ? "Create New Delegation" : "Begin Delegation Coaching"}
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Card>

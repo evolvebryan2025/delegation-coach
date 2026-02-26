@@ -39,7 +39,7 @@ const Dashboard = () => {
               <h1 className="text-4xl font-bold mb-2">Your Delegation Dashboard</h1>
               <p className="text-muted-foreground text-lg">Track your progress and see your impact grow</p>
             </div>
-            <Button onClick={() => navigate("/coach/welcome")}>
+            <Button onClick={() => navigate("/coach/task-selection")}>
               <Plus className="w-4 h-4 mr-2" />
               New Delegation
             </Button>
@@ -130,7 +130,7 @@ const Dashboard = () => {
               {plans.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground mb-4">No active delegations yet</p>
-                  <Button onClick={() => navigate("/coach/welcome")}>
+                  <Button onClick={() => navigate("/coach/task-selection")}>
                     Create Your First Plan
                   </Button>
                 </div>
@@ -148,7 +148,7 @@ const Dashboard = () => {
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold mb-1">{plan.task_name}</div>
                         <div className="text-sm text-muted-foreground">
-                          Delegated to {plan.team_member} • Due {new Date(plan.deadline).toLocaleDateString()}
+                          Delegated to {plan.team_member}{plan.deadline ? ` • Due ${new Date(plan.deadline).toLocaleDateString()}` : ""}
                         </div>
                       </div>
                       <div className="px-3 py-1 rounded-full text-xs font-semibold flex-shrink-0 bg-primary/20 text-primary">

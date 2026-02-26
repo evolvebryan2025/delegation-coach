@@ -8,7 +8,7 @@ interface BenefitCardProps {
 
 export const BenefitCard = ({ icon: Icon, title, description }: BenefitCardProps) => {
   return (
-    <div className="enterprise-card p-6 hover:border-border-accent">
+    <div className="enterprise-card p-6 hover:border-accent">
       <div className="w-14 h-14 gradient-primary rounded-xl flex items-center justify-center mb-4 shadow-glow-sm">
         <Icon className="w-7 h-7 text-white" />
       </div>

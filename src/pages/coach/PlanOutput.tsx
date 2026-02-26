@@ -32,14 +32,40 @@ const parseCheckInSchedule = (scheduleStr: string): CheckInSchedule | null => {
   }
 };
 
+const parseRiskItem = (risk: any): RiskItem | null => {
+  if (typeof risk === "object" && risk !== null && "risk" in risk && "mitigation" in risk) {
+    return risk as RiskItem;
+  }
+  if (typeof risk === "string") {
+    return parseRisk(risk);
+  }
+  return null;
+};
+
 const PlanOutput = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  if (!location.state) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-24 pb-16 px-4">
+          <div className="container mx-auto max-w-5xl text-center">
+            <h2 className="text-2xl font-bold mb-4">No Plan Data</h2>
+            <p className="text-muted-foreground mb-6">Please build a plan first.</p>
+            <Button onClick={() => navigate("/coach/plan-builder")}>Go to Plan Builder</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const { plan, aiData } = location.state as any;
 
   const copyHandoffMessage = () => {
-    navigator.clipboard.writeText(plan.handoff_message);
+    navigator.clipboard.writeText(plan.handoff_message || "");
     toast({ title: "Copied!", description: "Handoff message copied to clipboard." });
   };
 
@@ -80,7 +106,7 @@ const PlanOutput = () => {
                 <p className="text-lg">{plan.outcome}</p>
               </div>
 
-              <div>
+              {plan.success_criteria && plan.success_criteria.length > 0 && <div>
                 <h3 className="text-xl font-semibold mb-2 text-primary">Success Criteria</h3>
                 <ul className="space-y-2">
                   {plan.success_criteria.map((criteria: string, i: number) => (
@@ -90,18 +116,19 @@ const PlanOutput = () => {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </div>}
 
-              <div>
+              {plan.context && <div>
                 <h3 className="text-xl font-semibold mb-2 text-primary">Context</h3>
                 <p>{plan.context}</p>
-              </div>
+              </div>}
 
-              <div>
+              {plan.risks && plan.risks.length > 0 && <div>
                 <h3 className="text-xl font-semibold mb-2 text-warning">Risks & Mitigation</h3>
                 <ul className="space-y-3">
-                  {plan.risks.map((riskStr: string, i: number) => {
-                    const riskData = parseRisk(riskStr);
+                  {plan.risks.map((riskItem: any, i: number) => {
+                    const riskData = parseRiskItem(riskItem);
+                    const riskStr = typeof riskItem === "string" ? riskItem : JSON.stringify(riskItem);
                     if (!riskData) return (
                       <li key={i} className="flex items-start gap-2">
                         <AlertTriangle className="w-4 h-4 text-warning mt-1 flex-shrink-0" />
@@ -122,7 +149,7 @@ const PlanOutput = () => {
                     );
                   })}
                 </ul>
-              </div>
+              </div>}
 
               <div>
                 <h3 className="text-xl font-semibold mb-2 text-primary">Check-in Schedule</h3>
