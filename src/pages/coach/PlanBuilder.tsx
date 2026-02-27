@@ -10,6 +10,7 @@ import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, X } from "lucide-react";
+import { generateDelegationPlan } from "@/services/aiService";
 
 const PlanBuilder = () => {
   const location = useLocation();
@@ -91,29 +92,11 @@ const PlanBuilder = () => {
         support_needed: support,
       };
 
-      const { data: functionData, error: functionError } = await supabase.functions.invoke(
-        "generate-delegation-plan",
-        { body: { planData } }
-      );
-
-      if (functionError) throw functionError;
-
-      if (functionData?.error) {
-        toast({
-          title: "AI Error",
-          description: functionData.error,
-          variant: "destructive",
-        });
-        return;
-      }
+      const aiPlan = await generateDelegationPlan(planData);
 
       // Stringify objects for text/text[] DB columns
-      const risksForDb = Array.isArray(functionData.plan.risks)
-        ? functionData.plan.risks.map((r: any) => typeof r === 'string' ? r : JSON.stringify(r))
-        : [];
-      const scheduleForDb = typeof functionData.plan.check_in_schedule === 'string'
-        ? functionData.plan.check_in_schedule
-        : JSON.stringify(functionData.plan.check_in_schedule);
+      const risksForDb = aiPlan.risks.map((r) => JSON.stringify(r));
+      const scheduleForDb = JSON.stringify(aiPlan.check_in_schedule);
 
       const { data: savedPlan, error: saveError } = await supabase
         .from("delegation_plans")
@@ -122,14 +105,14 @@ const PlanBuilder = () => {
           task_name: taskName,
           outcome,
           context,
-          success_criteria: functionData.plan.success_criteria,
+          success_criteria: aiPlan.success_criteria,
           risks: risksForDb,
           support_needed: support,
           check_in_schedule: scheduleForDb,
           deadline,
           autonomy_level: getAutonomyLabel(autonomyLevel[0]),
           team_member: teamMember,
-          handoff_message: functionData.plan.handoff_message,
+          handoff_message: aiPlan.handoff_message,
           status: "draft",
         })
         .select()
@@ -137,7 +120,7 @@ const PlanBuilder = () => {
 
       if (saveError) throw saveError;
 
-      navigate("/coach/plan-output", { state: { plan: savedPlan, aiData: functionData.plan } });
+      navigate("/coach/plan-output", { state: { plan: savedPlan, aiData: aiPlan } });
     } catch (error: any) {
       toast({
         title: "Error",

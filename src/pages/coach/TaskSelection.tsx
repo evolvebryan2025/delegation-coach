@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check, Zap } from "lucide-react";
+import { clarifyTask } from "@/services/aiService";
 
 const PLAN_TEMPLATES = [
   {
@@ -114,23 +115,8 @@ const TaskSelection = () => {
 
     setClarifying(true);
     try {
-      const { data: functionData, error: functionError } = await supabase.functions.invoke(
-        "clarify-task",
-        { body: { task, responses } }
-      );
-
-      if (functionError) throw functionError;
-
-      if (functionData?.error) {
-        toast({
-          title: "AI Error",
-          description: functionData.error,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setClarification(functionData.clarification);
+      const result = await clarifyTask(task, responses);
+      setClarification(result);
     } catch (error: any) {
       toast({
         title: "Error",

@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      '/api/webhook': {
+        target: 'https://madeeas.app.n8n.cloud',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/webhook/, '/webhook/delegate/ai'),
+        secure: true,
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

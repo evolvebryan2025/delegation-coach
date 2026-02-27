@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Check } from "lucide-react";
+import { analyzeAssessment } from "@/services/aiService";
 
 const questions = [
   {
@@ -122,29 +123,20 @@ const DelegationAssessment = () => {
       if (saveError) throw saveError;
 
       setAnalyzing(true);
-      
-      const { data: functionData, error: functionError } = await supabase.functions.invoke(
-        "analyze-assessment",
-        { body: { assessment: responses } }
-      );
 
-      if (functionError) throw functionError;
-
-      if (functionData?.error) {
-        toast({
-          title: "AI Analysis Error",
-          description: functionData.error,
-          variant: "destructive",
-        });
-        return;
-      }
+      const insights = await analyzeAssessment({
+        draining_tasks: responses.draining_tasks,
+        tasks_not_delegating: responses.tasks_not_delegating,
+        delegation_barriers: responses.delegation_barriers,
+        team_members: responses.team_members,
+      });
 
       await supabase
         .from("delegation_assessments")
-        .update({ ai_insights: JSON.stringify(functionData.insights) })
+        .update({ ai_insights: JSON.stringify(insights) })
         .eq("id", assessment.id);
 
-      setInsights(functionData.insights);
+      setInsights(insights);
     } catch (error: any) {
       toast({
         title: "Error",
