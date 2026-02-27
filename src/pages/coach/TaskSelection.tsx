@@ -9,7 +9,46 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, Zap } from "lucide-react";
+
+const PLAN_TEMPLATES = [
+  {
+    name: "Weekly Status Reports",
+    task: "Creating and distributing weekly status reports",
+    importance: "Keeps stakeholders informed and builds accountability across the team.",
+    success: "Clear, accurate reports delivered on time every week with key metrics highlighted.",
+    context: "Access to project management tools, prior report templates, and stakeholder distribution list.",
+    timeline: "Ongoing, weekly cadence",
+    autonomy: "medium",
+  },
+  {
+    name: "Meeting Coordination",
+    task: "Scheduling and preparing agendas for recurring team meetings",
+    importance: "Ensures productive meetings that respect everyone's time.",
+    success: "Agendas sent 24h in advance, meeting notes distributed within 2h, action items tracked.",
+    context: "Calendar access, meeting templates, and knowledge of key discussion topics.",
+    timeline: "Ongoing",
+    autonomy: "high",
+  },
+  {
+    name: "Client Onboarding",
+    task: "Managing the new client onboarding process",
+    importance: "First impressions drive retention. A smooth onboarding builds trust.",
+    success: "New clients fully set up within 48h with all resources provided and intro calls completed.",
+    context: "CRM access, onboarding checklist, welcome email templates, and key contacts.",
+    timeline: "Per new client, 1-2 week cycles",
+    autonomy: "medium",
+  },
+  {
+    name: "Data Entry & Cleanup",
+    task: "Cleaning and organizing data in our primary database or CRM",
+    importance: "Clean data drives better decisions and prevents costly errors.",
+    success: "No duplicate records, all fields standardized, validation rules documented.",
+    context: "Database access, data standards guide, and list of priority fields.",
+    timeline: "2 weeks initial cleanup, then ongoing maintenance",
+    autonomy: "low",
+  },
+];
 
 const TaskSelection = () => {
   const [selectedTask, setSelectedTask] = useState("");
@@ -46,6 +85,19 @@ const TaskSelection = () => {
       
       setExtractedTasks(tasks.slice(0, 5));
     }
+  };
+
+  const applyTemplate = (template: typeof PLAN_TEMPLATES[0]) => {
+    setSelectedTask("custom");
+    setCustomTask(template.task);
+    setResponses({
+      importance: template.importance,
+      success: template.success,
+      context: template.context,
+      timeline: template.timeline,
+      autonomy: template.autonomy,
+    });
+    toast({ title: "Template applied", description: `"${template.name}" template loaded. Review and customize as needed.` });
   };
 
   const handleClarify = async () => {
@@ -110,6 +162,26 @@ const TaskSelection = () => {
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-4">Select a Task to Delegate</h1>
             <p className="text-muted-foreground">Choose one task to focus on, and we'll help you create a complete delegation plan.</p>
+          </div>
+
+          {/* Quick-start Templates */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-secondary" />
+              Quick-Start Templates
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {PLAN_TEMPLATES.map((template, i) => (
+                <Card
+                  key={i}
+                  className="p-4 cursor-pointer hover:shadow-card-hover transition-all hover:border-secondary/50"
+                  onClick={() => applyTemplate(template)}
+                >
+                  <h3 className="font-semibold mb-1">{template.name}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{template.task}</p>
+                </Card>
+              ))}
+            </div>
           </div>
 
           <Card className="p-8 mb-6">

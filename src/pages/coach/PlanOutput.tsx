@@ -1,9 +1,11 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Download, Mail, Edit, ArrowRight, Check, AlertTriangle, Shield, Clock, Video, ListChecks } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Copy, Download, Mail, Edit, ArrowRight, Check, AlertTriangle, Shield, Clock, Video, ListChecks, Loader2 } from "lucide-react";
 
 interface RiskItem {
   risk: string;
@@ -46,8 +48,56 @@ const PlanOutput = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { id } = useParams<{ id: string }>();
+  const [plan, setPlan] = useState<any>(null);
+  const [aiData, setAiData] = useState<any>(null);
+  const [loadingPlan, setLoadingPlan] = useState(true);
 
-  if (!location.state) {
+  useEffect(() => {
+    if (location.state) {
+      const state = location.state as any;
+      setPlan(state.plan);
+      setAiData(state.aiData || null);
+      setLoadingPlan(false);
+      return;
+    }
+
+    if (id) {
+      const fetchPlan = async () => {
+        setLoadingPlan(true);
+        const { data, error } = await supabase
+          .from("delegation_plans")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error || !data) {
+          toast({ title: "Plan not found", description: "Could not load the delegation plan.", variant: "destructive" });
+          navigate("/plans");
+          return;
+        }
+        setPlan(data);
+        setLoadingPlan(false);
+      };
+      fetchPlan();
+      return;
+    }
+
+    setLoadingPlan(false);
+  }, [id, location.state]);
+
+  if (loadingPlan) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-24 pb-16 px-4 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!plan) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -61,8 +111,6 @@ const PlanOutput = () => {
       </div>
     );
   }
-
-  const { plan, aiData } = location.state as any;
 
   const copyHandoffMessage = () => {
     navigator.clipboard.writeText(plan.handoff_message || "");
@@ -201,7 +249,7 @@ const PlanOutput = () => {
           <div className="flex gap-4">
             <Button variant="outline" onClick={downloadPlan}><Download className="w-4 h-4 mr-2" /> Download</Button>
             <Button variant="outline" onClick={() => navigate("/coach/plan-builder", { state: location.state })}><Edit className="w-4 h-4 mr-2" /> Edit</Button>
-            <Button onClick={() => navigate("/coach/follow-up", { state: { plan } })} className="flex-1">
+            <Button onClick={() => navigate(plan.id ? `/coach/follow-up/${plan.id}` : "/coach/follow-up", { state: { plan } })} className="flex-1">
               Set Up Follow-Up <ArrowRight className="ml-2" />
             </Button>
           </div>

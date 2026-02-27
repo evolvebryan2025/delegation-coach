@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,33 +14,81 @@ const FollowUp = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { id } = useParams<{ id: string }>();
 
+  const [plan, setPlan] = useState<any>(null);
+  const [loadingPlan, setLoadingPlan] = useState(true);
   const [checkInDate, setCheckInDate] = useState("");
+  const [dateError, setDateError] = useState("");
   const [frequency, setFrequency] = useState("weekly");
   const [loading, setLoading] = useState(false);
 
-  if (!location.state || !(location.state as any).plan) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <div className="pt-24 pb-16 px-4">
-          <div className="container mx-auto max-w-3xl text-center">
-            <h2 className="text-2xl font-bold mb-4">No Plan Selected</h2>
-            <p className="text-muted-foreground mb-6">Please create a delegation plan first.</p>
-            <Button onClick={() => navigate("/coach/plan-builder")}>Go to Plan Builder</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (location.state && (location.state as any).plan) {
+      setPlan((location.state as any).plan);
+      setLoadingPlan(false);
+      return;
+    }
 
-  const { plan } = location.state as any;
+    if (id) {
+      const fetchPlan = async () => {
+        setLoadingPlan(true);
+        const { data, error } = await supabase
+          .from("delegation_plans")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error || !data) {
+          toast({ title: "Plan not found", description: "Could not load the delegation plan.", variant: "destructive" });
+          navigate("/plans");
+          return;
+        }
+        setPlan(data);
+        setLoadingPlan(false);
+      };
+      fetchPlan();
+      return;
+    }
+
+    setLoadingPlan(false);
+  }, [id, location.state]);
+
+  const validateDate = (dateStr: string) => {
+    if (!dateStr) {
+      setDateError("");
+      return;
+    }
+    const selected = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selected < today) {
+      setDateError("Check-in date must be today or in the future.");
+    } else {
+      setDateError("");
+    }
+  };
+
+  const handleDateChange = (value: string) => {
+    setCheckInDate(value);
+    validateDate(value);
+  };
 
   const handleComplete = async () => {
     if (!checkInDate) {
       toast({ title: "Date Required", description: "Please select a check-in date.", variant: "destructive" });
       return;
     }
+
+    const selected = new Date(checkInDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selected < today) {
+      toast({ title: "Invalid Date", description: "Check-in date must be today or in the future.", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -64,10 +112,38 @@ const FollowUp = () => {
     }
   };
 
+  if (loadingPlan) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-24 pb-16 px-4 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!plan) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-24 pb-16 px-4">
+          <div className="container mx-auto max-w-3xl text-center">
+            <h2 className="text-2xl font-bold mb-4">No Plan Selected</h2>
+            <p className="text-muted-foreground mb-6">Please create a delegation plan first.</p>
+            <Button onClick={() => navigate("/coach/plan-builder")}>Go to Plan Builder</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <div className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">
           <Card className="p-8">
@@ -82,7 +158,14 @@ const FollowUp = () => {
             <div className="space-y-6">
               <div>
                 <Label>First Check-In Date</Label>
-                <Input type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} />
+                <Input
+                  type="date"
+                  value={checkInDate}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  min={today}
+                  className={dateError ? "border-destructive" : ""}
+                />
+                {dateError && <p className="text-xs text-destructive mt-1">{dateError}</p>}
               </div>
 
               <div>
@@ -100,7 +183,7 @@ const FollowUp = () => {
                 </Select>
               </div>
 
-              <Button onClick={handleComplete} disabled={loading} size="lg" className="w-full">
+              <Button onClick={handleComplete} disabled={loading || !!dateError} size="lg" className="w-full">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 Complete & View Dashboard
               </Button>

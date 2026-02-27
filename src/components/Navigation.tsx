@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, User } from "lucide-react";
 import logo from "@/assets/madeea-logo.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "./NavLink";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,12 @@ export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Auto-close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   const handleGetStarted = () => {
     if (isAuthenticated) {
