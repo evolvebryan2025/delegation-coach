@@ -107,6 +107,14 @@ const PlanBuilder = () => {
         return;
       }
 
+      // Stringify objects for text/text[] DB columns
+      const risksForDb = Array.isArray(functionData.plan.risks)
+        ? functionData.plan.risks.map((r: any) => typeof r === 'string' ? r : JSON.stringify(r))
+        : [];
+      const scheduleForDb = typeof functionData.plan.check_in_schedule === 'string'
+        ? functionData.plan.check_in_schedule
+        : JSON.stringify(functionData.plan.check_in_schedule);
+
       const { data: savedPlan, error: saveError } = await supabase
         .from("delegation_plans")
         .insert({
@@ -115,9 +123,9 @@ const PlanBuilder = () => {
           outcome,
           context,
           success_criteria: functionData.plan.success_criteria,
-          risks: functionData.plan.risks,
+          risks: risksForDb,
           support_needed: support,
-          check_in_schedule: functionData.plan.check_in_schedule,
+          check_in_schedule: scheduleForDb,
           deadline,
           autonomy_level: getAutonomyLabel(autonomyLevel[0]),
           team_member: teamMember,

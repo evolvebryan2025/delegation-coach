@@ -7,6 +7,51 @@ const corsHeaders = {
 
 const WEBHOOK_URL = 'https://madeeas.app.n8n.cloud/webhook/delegate/ai';
 
+/**
+ * n8n Structured Output Parser1 returns:
+ * {
+ *   "success": true,
+ *   "result": {
+ *     "questions": ["..."],
+ *     "refined_outcome": "...",
+ *     "context_needed": ["..."],       <-- array, frontend expects "suggested_context" (string)
+ *     "success_criteria": ["..."]
+ *   }
+ * }
+ */
+function extractResult(data: any): any {
+  if (data?.success && data?.result) return data.result;
+  if (data?.refined_outcome || data?.context_needed || data?.success_criteria) return data;
+  if (Array.isArray(data) && data[0]) return extractResult(data[0]);
+  if (data?.output) return extractResult(typeof data.output === 'string' ? JSON.parse(data.output) : data.output);
+  return data;
+}
+
+function normalizeClarification(result: any): {
+  refined_outcome: string;
+  suggested_context: string;
+  success_criteria: string[];
+  questions: string[];
+} {
+  // Map n8n's "context_needed" (array) → frontend's "suggested_context" (string)
+  let suggestedContext = '';
+  if (typeof result?.suggested_context === 'string') {
+    suggestedContext = result.suggested_context;
+  } else if (Array.isArray(result?.context_needed)) {
+    suggestedContext = result.context_needed.join('\n• ');
+    if (suggestedContext) suggestedContext = '• ' + suggestedContext;
+  } else if (typeof result?.context_needed === 'string') {
+    suggestedContext = result.context_needed;
+  }
+
+  return {
+    refined_outcome: typeof result?.refined_outcome === 'string' ? result.refined_outcome : '',
+    suggested_context: suggestedContext,
+    success_criteria: Array.isArray(result?.success_criteria) ? result.success_criteria : [],
+    questions: Array.isArray(result?.questions) ? result.questions : [],
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -30,7 +75,7 @@ Based on this information, provide:
 4. Recommended success criteria`;
 
     const sessionId = crypto.randomUUID();
-    
+
     const payload = {
       session_id: sessionId,
       function_type: 'clarify_task',
@@ -42,36 +87,39 @@ Based on this information, provide:
       }
     };
 
-    console.log('[clarify-task] Calling webhook with:', payload);
+    console.log('[clarify-task] Calling webhook with:', JSON.stringify(payload));
 
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) {
-      throw new Error(`Webhook error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text().catch(() => 'No error body');
+      throw new Error(`Webhook error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const rawData = await response.json();
     const duration = Date.now() - startTime;
-    
-    console.log(`[clarify-task] Received response in ${duration}ms:`, data);
+    console.log(`[clarify-task] Raw response in ${duration}ms:`, JSON.stringify(rawData));
 
-    if (!data.success) {
-      throw new Error(data.error || 'Webhook returned unsuccessful response');
+    if (rawData?.error || rawData?.success === false) {
+      throw new Error(rawData.error || rawData.message || 'Webhook returned unsuccessful response');
     }
 
-    return new Response(JSON.stringify({ clarification: data.result }), {
+    const result = extractResult(rawData);
+    const clarification = normalizeClarification(result);
+
+    console.log('[clarify-task] Mapped clarification:', JSON.stringify(clarification));
+
+    return new Response(JSON.stringify({ clarification }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in clarify-task:', error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: error instanceof Error ? error.message : 'Unknown error',
       details: 'Failed to clarify task via webhook'
     }), {

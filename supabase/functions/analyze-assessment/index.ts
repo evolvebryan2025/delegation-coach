@@ -7,6 +7,45 @@ const corsHeaders = {
 
 const WEBHOOK_URL = 'https://madeeas.app.n8n.cloud/webhook/delegate/ai';
 
+/**
+ * n8n "Respond to Webhook" node returns: JSON.stringify($json.output)
+ * where $json.output is the structured output parser result:
+ * {
+ *   "success": true,
+ *   "result": {
+ *     "patterns": ["..."],
+ *     "barriers": ["..."],
+ *     "recommendations": ["..."],
+ *     "summary": "..."
+ *   }
+ * }
+ */
+function extractResult(data: any): any {
+  // n8n structured output: { success: true, result: { ... } }
+  if (data?.success && data?.result) return data.result;
+  // If $json.output was the result object directly
+  if (data?.patterns || data?.barriers || data?.recommendations) return data;
+  // Array wrapper
+  if (Array.isArray(data) && data[0]) return extractResult(data[0]);
+  // Nested under output key
+  if (data?.output) return extractResult(typeof data.output === 'string' ? JSON.parse(data.output) : data.output);
+  return data;
+}
+
+function normalizeInsights(result: any): {
+  patterns: string[];
+  barriers: string[];
+  recommendations: string[];
+  summary: string;
+} {
+  return {
+    patterns: Array.isArray(result?.patterns) ? result.patterns : [],
+    barriers: Array.isArray(result?.barriers) ? result.barriers : [],
+    recommendations: Array.isArray(result?.recommendations) ? result.recommendations : [],
+    summary: typeof result?.summary === 'string' ? result.summary : 'Assessment analysis complete.',
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -27,7 +66,7 @@ serve(async (req) => {
 Analyze these responses and provide specific insights.`;
 
     const sessionId = crypto.randomUUID();
-    
+
     const payload = {
       session_id: sessionId,
       function_type: 'analyze_assessment',
@@ -41,36 +80,39 @@ Analyze these responses and provide specific insights.`;
       }
     };
 
-    console.log('[analyze-assessment] Calling webhook with:', payload);
+    console.log('[analyze-assessment] Calling webhook with:', JSON.stringify(payload));
 
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) {
-      throw new Error(`Webhook error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text().catch(() => 'No error body');
+      throw new Error(`Webhook error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const rawData = await response.json();
     const duration = Date.now() - startTime;
-    
-    console.log(`[analyze-assessment] Received response in ${duration}ms:`, data);
+    console.log(`[analyze-assessment] Raw response in ${duration}ms:`, JSON.stringify(rawData));
 
-    if (!data.success) {
-      throw new Error(data.error || 'Webhook returned unsuccessful response');
+    if (rawData?.error || rawData?.success === false) {
+      throw new Error(rawData.error || rawData.message || 'Webhook returned unsuccessful response');
     }
 
-    return new Response(JSON.stringify({ insights: data.result }), {
+    const result = extractResult(rawData);
+    const insights = normalizeInsights(result);
+
+    console.log('[analyze-assessment] Mapped insights:', JSON.stringify(insights));
+
+    return new Response(JSON.stringify({ insights }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in analyze-assessment:', error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: error instanceof Error ? error.message : 'Unknown error',
       details: 'Failed to analyze assessment via webhook'
     }), {
