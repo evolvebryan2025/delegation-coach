@@ -115,7 +115,10 @@ const DelegationAssessment = () => {
         .from("delegation_assessments")
         .insert({
           user_id: user.id,
-          ...responses,
+          draining_tasks: responses.draining_tasks,
+          tasks_not_delegating: responses.tasks_not_delegating,
+          delegation_barriers: responses.delegation_barriers,
+          team_members: responses.team_members,
         })
         .select()
         .single();

@@ -43,12 +43,22 @@ async function callWebhook(payload: Record<string, any>): Promise<any> {
     signal: AbortSignal.timeout(30000),
   });
 
+  const responseText = await response.text().catch(() => '');
+
   if (!response.ok) {
-    const errorText = await response.text().catch(() => 'No error body');
-    throw new Error(`Webhook error: ${response.status} ${response.statusText} - ${errorText}`);
+    throw new Error(`Webhook error: ${response.status} ${response.statusText} - ${responseText || 'No error body'}`);
   }
 
-  const rawData = await response.json();
+  if (!responseText || responseText.trim().length === 0) {
+    throw new Error('Webhook returned an empty response. Please check that your n8n workflow is configured to return JSON output.');
+  }
+
+  let rawData: any;
+  try {
+    rawData = JSON.parse(responseText);
+  } catch {
+    throw new Error(`Webhook returned invalid JSON: ${responseText.slice(0, 200)}`);
+  }
 
   if (rawData?.error || rawData?.success === false) {
     throw new Error(rawData.error || rawData.message || 'Webhook returned unsuccessful response');
