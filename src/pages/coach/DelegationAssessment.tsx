@@ -64,16 +64,7 @@ const DelegationAssessment = () => {
         return;
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from("delegation_assessments")
-        .select("id")
-        .eq("user_id", user.id)
-        .limit(1);
-      if (data && data.length > 0) {
-        navigate("/coach/task-selection", { replace: true });
-      }
+      // Allow users to retake the assessment — no redirect if they already have one
     };
     checkExisting();
   }, [toast, navigate]);
